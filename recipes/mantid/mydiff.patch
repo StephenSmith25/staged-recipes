@@ -1,0 +1,86 @@
+diff --git a/buildconfig/CMake/DarwinSetup.cmake b/buildconfig/CMake/DarwinSetup.cmake
+index 3b06d6c2366..7859c611a50 100644
+--- a/buildconfig/CMake/DarwinSetup.cmake
++++ b/buildconfig/CMake/DarwinSetup.cmake
+@@ -132,38 +132,4 @@ if(NOT HDF5_ROOT)
+     set(HDF5_ROOT /usr/local/opt/hdf5) # Only for homebrew!
+ endif()
+ 
+-if(ENABLE_WORKBENCH)
+-  set(CPACK_GENERATOR DragNDrop)
+-  set(CMAKE_INSTALL_PREFIX "")
+-  # Replace hdiutil command to retry on detach failure
+-  set(CPACK_COMMAND_HDIUTIL ${CMAKE_SOURCE_DIR}/installers/MacInstaller/hdiutilwrap)
+-  set(CMAKE_MACOSX_RPATH 1)
+-  set(CPACK_DMG_BACKGROUND_IMAGE
+-      ${CMAKE_SOURCE_DIR}/images/osx-bundle-background.png
+-  )
+-  string(REPLACE " " "" CPACK_SYSTEM_NAME ${MACOS_CODENAME})
+-
+-  set(WORKBENCH_BUNDLE MantidWorkbench.app/Contents/)
+-  set(WORKBENCH_APP MantidWorkbench${CPACK_PACKAGE_SUFFIX_CAMELCASE}.app)
+-  set(WORKBENCH_BUNDLE ${WORKBENCH_APP}/Contents/)
+-  set(WORKBENCH_BIN_DIR ${WORKBENCH_BUNDLE}MacOS)
+-  set(WORKBENCH_LIB_DIR ${WORKBENCH_BUNDLE}MacOS)
+-  set(WORKBENCH_SITE_PACKAGES ${WORKBENCH_BUNDLE}MacOS)
+-  set(WORKBENCH_PLUGINS_DIR ${WORKBENCH_BUNDLE}PlugIns)
+-
+-  install(
+-    PROGRAMS ${CMAKE_BINARY_DIR}/mantidpython_osx_install
+-    DESTINATION ${WORKBENCH_BUNDLE}/MacOS/
+-    RENAME mantidpython
+-  )
+-  install(
+-    FILES ${CMAKE_SOURCE_DIR}/images/mantid_workbench${CPACK_PACKAGE_SUFFIX}.icns
+-    DESTINATION ${WORKBENCH_BUNDLE}Resources/
+-  )
+-  set(BUNDLES ${INBUNDLE} ${WORKBENCH_BUNDLE})
+ 
+-  # Produce script to move icons in finder window to the correct locations
+-  configure_file(${CMAKE_SOURCE_DIR}/installers/MacInstaller/CMakeDMGSetup.scpt.in
+-                 ${CMAKE_BINARY_DIR}/DMGSetup.scpt @ONLY)
+-  set(CPACK_DMG_DS_STORE_SETUP_SCRIPT ${CMAKE_BINARY_DIR}/DMGSetup.scpt)
+-endif()
+diff --git a/qt/applications/workbench/CMakeLists.txt b/qt/applications/workbench/CMakeLists.txt
+index abb7ecd5b87..f5bfd433897 100644
+--- a/qt/applications/workbench/CMakeLists.txt
++++ b/qt/applications/workbench/CMakeLists.txt
+@@ -63,7 +63,7 @@ if(APPLE OR WIN32)
+                         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+   target_compile_definitions(MantidWorkbenchInstalled
+     PRIVATE
+-    -DPYTHON_EXECUTABLE_PATH="${_py_exe}"
++    -DPYTHON_EXECUTABLE_PATH="${WORKBENCH_PYTHON_EXECUTABLE}"
+     -DQT_PLUGIN_PATH="${_qt_plugins}")
+   target_link_libraries(MantidWorkbenchInstalled PRIVATE Boost::filesystem)
+   if(WIN32)
+@@ -127,29 +127,6 @@ endif()
+ # Dependency chain
+ add_dependencies(workbench workbench_resources mantidqt)
+ 
+-# macOS package fixes
+-if(APPLE)
+-  # create Info.plist
+-  set ( MAC_BUNDLE_EXECUTABLE ${PACKAGE_EXECUTABLE})
+-  set ( MAC_BUNDLE_IDENTIFIER "org.mantidproject.${PACKAGE_EXECUTABLE}" )
+-  set ( MAC_BUNDLE_ICON mantid_workbench${CPACK_PACKAGE_SUFFIX}.icns )
+-  set ( MAC_BUNDLE_NAME ${PACKAGE_EXECUTABLE} )
+-  configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/../../../installers/MacInstaller/Info.plist.in
+-                   ${CMAKE_CURRENT_BINARY_DIR}/Info.plist
+-                   @ONLY )
+-
+-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Info.plist DESTINATION ${WORKBENCH_BUNDLE} )
+-install (CODE "
+-    execute_process(COMMAND ${CMAKE_SOURCE_DIR}/installers/MacInstaller/make_package.rb
+-                            \${CMAKE_INSTALL_PREFIX}/${WORKBENCH_APP} ${Python_EXECUTABLE}
+-                    RESULT_VARIABLE install_name_tool_result OUTPUT_VARIABLE _out ERROR_VARIABLE _out COMMAND_ECHO STDOUT)
+-    if(NOT install_name_tool_result EQUAL 0)
+-      message(\"\${_out}\")
+-      message(FATAL_ERROR \"Package script failed!!!\n\")
+-    endif()
+-")
+-endif()
+-
+ # Testing
+ set(TEST_FILES
+     workbench/config/test/test_user.py

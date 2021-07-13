@@ -1,0 +1,94 @@
+{% set version = "6.1.20210702.1408" %}
+{% set git_rev = "fa20afa218b94589948607ba97e5c66778e8e60a" %}
+
+package:
+  name: mantid-framework
+  version: {{ version }}
+
+source:
+  git_rev: {{ git_rev }}
+  git_url: https://github.com/mantidproject/mantid.git
+  patches:
+    - mydiff.patch # [osx]
+
+
+requirements:
+  build:
+    - {{ compiler("c") }}
+    - {{ compiler("cxx") }}
+    - llvm-openmp  # [osx]
+    - ninja  # [unix]
+    - cmake
+
+  host:
+    - boost {{ boost }}
+    - doxygen>=1.9.*
+    - graphviz>=2.47.0
+    - gsl=2.6 
+    - h5py<3 
+    - hdf5
+    - jemalloc
+    - jsoncpp>=1.9.4,<2
+    - librdkafka
+    - muparser
+    - nexus
+    - numpy>=1.20.2
+    - occt
+    - pip>=21.0.1
+    - poco
+    - pycifrw
+    - python-dateutil
+    - pyyaml
+    - qtpy
+    - requests
+    - scipy
+    - setuptools=48.0.0 
+    - sphinx
+    - sphinx_bootstrap_theme   
+    - tbb-devel=2020.2.*
+    - texlive-core  # [osx]
+    - zlib
+    - python {{ python }}
+    - python.app  # [osx]
+    - qscintilla2
+    - psutil
+    - qt==5.12.9
+    - toml
+    - qtpy >=1.5.0
+    - pyqt>=5.12.3,<6
+    - qtconsole >=5.0.3,<6
+
+  run:
+    - boost=1.75.* 
+    - h5py
+    - librdkafka
+    - nexus
+    - numpy
+    - poco
+    - python-dateutil>=2.8.1
+    - pyyaml
+    - scipy>=1.6.2
+    - jsoncpp>=1.9.4,<2
+    - muparser>=2.3.2
+    - occt
+    - tbb
+    - python
+    - psutil
+    - sphinx_bootstrap_theme   
+    - {{ pin_compatible("qscintilla2", max_pin="x.x") }}
+    - python {{ python }}
+    - qtconsole >=5.0.3,<6
+    - ipykernel<6 
+    - matplotlib 
+
+test:
+  imports:
+    - mantid.kernel
+    - mantid.geometry
+    - mantid.api
+    - mantid.simpleapi
+
+about:
+  home:
+  license:
+  license_file:
