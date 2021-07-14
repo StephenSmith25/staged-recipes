@@ -5,10 +5,15 @@ mkdir build
 cd build
 
 cmake \
-  --preset=osx \
   ${CMAKE_ARGS} \
   -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_PREFIX_PATH=$PREFIX \
+  -GNinja \
+  -DCMAKE_FIND_FRAMEWORK=LAST \
   -DENABLE_PRECOMMIT=OFF \
+  -DOpenSSL_ROOT=$PREFIX \
+  -DHDF5_ROOT=$PREFIX \
+  -DPython_ROOT_DIR=$PREFIX \
   ../
 
 ninja

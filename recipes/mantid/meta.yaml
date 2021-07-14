@@ -9,7 +9,8 @@ source:
   git_rev: {{ git_rev }}
   git_url: https://github.com/mantidproject/mantid.git
   patches:
-    - mydiff.patch # [osx]
+    - bundle.patch # [osx]
+    - finder.patch # [osx]
 
 
 requirements:
@@ -19,17 +20,17 @@ requirements:
     - llvm-openmp  # [osx]
     - ninja  # [unix]
     - cmake
-
   host:
     - boost {{ boost }}
     - doxygen>=1.9.*
     - graphviz>=2.47.0
     - gsl=2.6 
-    - h5py<3 
-    - hdf5
-    - jemalloc
+    - h5py
+    - hdf5=1.10.*
+    - jemalloc  # [unix]
     - jsoncpp>=1.9.4,<2
     - librdkafka
+    - lib3mf   # [win]
     - muparser
     - nexus
     - numpy>=1.20.2
@@ -72,6 +73,7 @@ requirements:
     - muparser>=2.3.2
     - occt
     - tbb
+    - hdf5=1.10.*
     - python
     - psutil
     - sphinx_bootstrap_theme   
@@ -83,10 +85,10 @@ requirements:
 
 test:
   imports:
-    - mantid.kernel
-    - mantid.geometry
-    - mantid.api
-    - mantid.simpleapi
+    - mantid.kernel  # [unix]
+    - mantid.geometry  # [unix]
+    - mantid.api  # [unix]
+    - mantid.simpleapi  # [unix]
 
 about:
   home:

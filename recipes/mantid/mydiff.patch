@@ -1,3 +1,15 @@
+diff --git a/buildconfig/CMake/Bootstrap.cmake b/buildconfig/CMake/Bootstrap.cmake
+index 62bba41bac1..fad9ea70315 100644
+--- a/buildconfig/CMake/Bootstrap.cmake
++++ b/buildconfig/CMake/Bootstrap.cmake
+@@ -181,7 +181,6 @@ endfunction()
+ 
+ # Find python interpreter
+ set(MINIMUM_PYTHON_VERSION 3.6)
+-set(Python3_ROOT_DIR $ENV{CONDA_PREFIX})
+ find_package(Python ${MINIMUM_PYTHON_VERSION} REQUIRED
+              COMPONENTS Interpreter Development NumPy)
+ # If anything external uses find_package(PythonInterp) then make sure it finds the correct version and executable
 diff --git a/buildconfig/CMake/DarwinSetup.cmake b/buildconfig/CMake/DarwinSetup.cmake
 index 3b06d6c2366..7859c611a50 100644
 --- a/buildconfig/CMake/DarwinSetup.cmake
@@ -41,6 +53,41 @@ index 3b06d6c2366..7859c611a50 100644
 -                 ${CMAKE_BINARY_DIR}/DMGSetup.scpt @ONLY)
 -  set(CPACK_DMG_DS_STORE_SETUP_SCRIPT ${CMAKE_BINARY_DIR}/DMGSetup.scpt)
 -endif()
+diff --git a/buildconfig/CMake/QScintillaFindImpl.cmake b/buildconfig/CMake/QScintillaFindImpl.cmake
+index e94df0c3641..9bd89dc7d40 100644
+--- a/buildconfig/CMake/QScintillaFindImpl.cmake
++++ b/buildconfig/CMake/QScintillaFindImpl.cmake
+@@ -63,23 +63,21 @@ function (find_qscintilla qt_version)
+   set ( _include_var QSCINTILLA_QT${qt_version}_INCLUDE_DIR )
+   find_path ( ${_include_var}
+       NAMES Qsci/qsciglobal.h
+-      PATHS ${_qsci_include_paths}
+-      NO_DEFAULT_PATH
++      HINTS ${_qsci_include_paths}
++      PATH_SUFFIXES include/qt include
+   )
+   set ( _library_var QSCINTILLA_QT${qt_version}_LIBRARY )
+-  if ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+-    set ( _default_path_opt NO_DEFAULT_PATH )
+-  endif()
++
+   find_library ( ${_library_var}
+     NAMES ${_qsci_lib_names}
+-    PATHS ${_qsci_lib_paths}
+-    ${_default_path_opt}
++    HINTS ${_qsci_lib_paths}
++    PATH_SUFFIXES lib
+   )
+   set ( _library_var_debug QSCINTILLA_QT${qt_version}_LIBRARY_DEBUG )
+   find_library ( ${_library_var_debug}
+     NAMES ${_qsci_lib_names_debug}
+-    PATHS ${_qsci_lib_paths}
+-    ${_default_path_opt}
++    HINTS ${_qsci_lib_paths}
++    PATH_SUFFIXES lib
+   )
+ 
+   if ( ${_include_var} AND ${_library_var} )
 diff --git a/qt/applications/workbench/CMakeLists.txt b/qt/applications/workbench/CMakeLists.txt
 index abb7ecd5b87..f5bfd433897 100644
 --- a/qt/applications/workbench/CMakeLists.txt
