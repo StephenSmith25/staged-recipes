@@ -12,3 +12,10 @@ python:
 
 boost:
   - 1.75
+
+numpy:
+  - 1.19
+
+pin_run_as_build:
+    boost:
+      max_pin: x.x

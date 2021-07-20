@@ -1,0 +1,71 @@
+{% set version = "6.1.20210702.1408" %}
+{% set git_rev = "27c76b3ebf3ebaa9f001641846e2a3a4daec1dcb" %}
+
+package:
+  name: mantid-framework
+  version: {{ version }}
+
+source:
+  git_rev: {{ git_rev }}
+  git_url: https://github.com/mantidproject/mantid.git
+  patches:
+    - finder.patch
+    - windows_mantid.patch  # [win]
+    - windows_bundle.patch  # [win]
+    - framework_patch.patch
+
+requirements:
+  build:
+    - {{ compiler("c") }}
+    - {{ compiler("cxx") }}
+    - llvm-openmp  # [osx]
+    - libgomp  # [linux]
+    - ninja  # [unix]
+    - cmake
+  host:
+    - boost<=1.75
+    - eigen
+    - gsl<=2.6
+    - h5py
+    - hdf5=1.10.*
+    - jemalloc  # [unix]
+    - jsoncpp>=1.9.4,<2
+    - librdkafka
+    - lib3mf  # [win]
+    - muparser
+    - nexus
+    - numpy {{ numpy }}
+    - occt
+    - python {{ python }}
+    - poco
+    - tbb-devel=2020.2.*
+    - zlib
+  run:
+    - {{ pin_compatible("boost", max_pin="x.x") }}
+    - {{ pin_compatible("gsl", max_pin="x.x") }}
+    - h5py
+    - lib3mf  # [win]
+    - matplotlib
+    - nexus
+    - {{ pin_compatible("numpy", max_pin="x.x") }}
+    - occt
+    - python
+    - python-dateutil
+    - pyyaml
+    - scipy
+
+test:
+  imports:
+    - mantid.kernel
+    - mantid.geometry
+    - mantid.api
+    - mantid.simpleapi
+
+about:
+  home: https://github.com/mantidproject/mantid
+  license: GPL-3.0-or-later
+  summary: Mantid provides a framework that supports high-performance computing and visualisation of materials science data.
+
+extra:
+  recipe-maintainers:
+    - StephenSmith25
