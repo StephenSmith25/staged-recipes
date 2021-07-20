@@ -1,0 +1,14 @@
+diff --git a/Framework/PythonInterface/mantid/__init__.py b/Framework/PythonInterface/mantid/__init__.py
+index 2a090b11697..ab5e08aaf41 100644
+--- a/Framework/PythonInterface/mantid/__init__.py
++++ b/Framework/PythonInterface/mantid/__init__.py
+@@ -52,6 +52,9 @@ def _bin_dirs():
+     # conda layout
+     yield os.path.dirname(sys.executable)
+ 
++    # conda windows layout
++    yield os.path.join(os.path.dirname(sys.executable), 'Library', 'bin')
++
+     # iterate over the PYTHONPATH, to scan all possible bin dirs
+     for path in sys.path:
+         yield path

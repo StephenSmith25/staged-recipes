@@ -80,9 +80,13 @@ test:
     - mantid.kernel
     - mantid.geometry
     - mantid.api
-    - mantid.simpleapi  # [unix]
+    - mantid.simpleapi
 
 about:
-  home:
-  license:
-  license_file:
+  home: https://github.com/mantidproject/mantid
+  license: GPL-3.0-or-later
+  summary: Mantid provides a framework that supports high-performance computing and visualisation of materials science data.
+
+extra:
+  recipe-maintainers:
+    - StephenSmith25
