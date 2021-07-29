@@ -16,6 +16,7 @@ cmake \
   -DOpenSSL_ROOT=$PREFIX \
   -DHDF5_ROOT=$PREFIX \
   -DPython_ROOT_DIR=$PREFIX \
+  -DUSE_PYTHON_DYNAMIC_LIB=OFF \
   -GNinja \
   ../
 
