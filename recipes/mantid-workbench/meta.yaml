@@ -2,14 +2,14 @@
 {% set git_rev = "27c76b3ebf3ebaa9f001641846e2a3a4daec1dcb" %}
 
 package:
-  name: mantid-framework
+  name: mantid-workbench
   version: {{ version }}
 
 source:
   git_rev: {{ git_rev }}
   git_url: https://github.com/mantidproject/mantid.git
   patches:
-    - bundle.patch # [osx]
+    - bundle.patch
     - finder.patch
     - windows_bundle.patch  # [win]
     - windows_mantid.patch  # [win]

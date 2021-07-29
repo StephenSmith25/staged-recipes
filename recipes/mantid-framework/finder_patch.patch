@@ -1,0 +1,346 @@
+diff --git a/buildconfig/CMake/Bootstrap.cmake b/buildconfig/CMake/Bootstrap.cmake
+index 11b98d47f4dd..23905b781c7b 100644
+--- a/buildconfig/CMake/Bootstrap.cmake
++++ b/buildconfig/CMake/Bootstrap.cmake
+@@ -179,7 +179,6 @@ endfunction()
+ 
+ # Find python interpreter
+ set(MINIMUM_PYTHON_VERSION 3.6)
+-set(Python3_ROOT_DIR $ENV{CONDA_PREFIX})
+ find_package(
+   Python ${MINIMUM_PYTHON_VERSION} REQUIRED COMPONENTS Interpreter Development
+                                                        NumPy
+diff --git a/buildconfig/CMake/FindPyQt.py b/buildconfig/CMake/FindPyQt.py
+deleted file mode 100644
+index 135feb4a36cf..000000000000
+--- a/buildconfig/CMake/FindPyQt.py
++++ /dev/null
+@@ -1,128 +0,0 @@
+-#!/usr/bin/env python
+-# -*- coding: utf-8 -*-
+-"""Inspect and extract the PyQt configuration.
+-
+-There is a commandline argument to select the version of PyQt.
+-"""
+-import argparse
+-import os
+-import pprint
+-import re
+-import site
+-import sys
+-
+-# Regular expression to extract the Qt version tag
+-QT_TAG_RE = re.compile(r'Qt_\d+_\d+_\d+')
+-
+-
+-class PyQtConfig:
+-    """Inspects the installed PyQt version and extracts
+-    information about it.
+-    """
+-
+-    version_hex: str
+-    version_str: str
+-    qt_tag: str
+-    sip_dir: str
+-    sip_flags: str
+-    pyuic_path: str
+-
+-    def __init__(self, major_version):
+-        """Inspects the named PyQt package given the major version number
+-        :param major_version: The major version number of the library
+-        """
+-        pyqt_name = f'PyQt{major_version}'
+-        qtcore = __import__(f'{pyqt_name}.QtCore', globals(), locals(), ['QtCore'], 0)
+-        self.version_hex = qtcore.PYQT_VERSION
+-        self.version_str = qtcore.PYQT_VERSION_STR
+-        self.sip_flags = qtcore.PYQT_CONFIGURATION['sip_flags']
+-        self.qt_tag = self._get_qt_tag(self.sip_flags)
+-
+-        conda_activated, conda_env = find_conda_env()
+-        if conda_activated:
+-            self.get_pyqt_conda_dirs(conda_env, pyqt_name)
+-        else:
+-            self.get_pyqt_dirs(pyqt_name)
+-
+-        # Assume uic script is in uic submodule
+-        uic = __import__(pyqt_name + '.uic', globals(), locals(), ['uic'], 0)
+-        self.pyuic_path = os.path.join(os.path.dirname(uic.__file__), 'pyuic.py')
+-
+-    def _get_qt_tag(self, sip_flags):
+-        match = QT_TAG_RE.search(sip_flags)
+-        if match:
+-            return match.group(0)
+-        else:
+-            return None
+-
+-    def __str__(self):
+-        lines = [
+-            'pyqt_version:%06.x' % self.version_hex,
+-            'pyqt_version_str:%s' % self.version_str,
+-            'pyqt_version_tag:%s' % self.qt_tag,
+-            'pyqt_sip_dir:%s' % self.sip_dir,
+-            'pyqt_sip_flags:%s' % self.sip_flags,
+-            'pyqt_pyuic:%s' % self.pyuic_path
+-        ]
+-        return '\n'.join(lines)
+-
+-    def get_pyqt_dirs(self, pyqt_name):
+-        # This is based on QScintilla's configure.py, and only works for the
+-        # default case where installation paths have not been changed in PyQt's
+-        # configuration process.
+-        if sys.platform == 'win32':
+-            self.sip_dir = os.path.join(sys.prefix, 'share', 'sip', pyqt_name)
+-        else:
+-            qt_maj_version = self.version_str[0]
+-            if sys.platform == 'darwin':
+-                prefix = '/usr/local/opt'  # brew Cellar
+-                possible_sip_dirs = []
+-                if qt_maj_version == '5':
+-                    possible_sip_dirs.append(os.path.join(site.getsitepackages()[0], 'PyQt5', 'bindings'))
+-                    possible_sip_dirs.append(os.path.join('pyqt', 'share', 'sip', 'Qt5'))
+-                    possible_sip_dirs.append(os.path.join('mantid-pyqt5', 'share', 'sip', 'Qt5'))
+-                else:
+-                    raise RuntimeError("Unknown Qt version ({}) found. Unable to determine location of PyQt sip files."
+-                                       "Please update FindPyQt accordingly.".format(self.version_str[0]))
+-            else:
+-                prefix = os.path.join(sys.prefix, 'share')
+-                possible_sip_dirs = (f'python{sys.version_info.major}{sys.version_info.minor}-sip/{pyqt_name}',
+-                                     f'python{sys.version_info.major}-sip/{pyqt_name}', f'sip/{pyqt_name}')
+-            for pyqt_sip_dir in possible_sip_dirs:
+-                if not os.path.isabs(pyqt_sip_dir):
+-                    pyqt_sip_dir = os.path.join(prefix, pyqt_sip_dir)
+-                if os.path.exists(pyqt_sip_dir):
+-                    self.sip_dir = pyqt_sip_dir
+-                    break
+-            if self.sip_dir is None:
+-                possible_sip_dirs = list(map(lambda p: os.path.join(prefix, p), possible_sip_dirs))
+-                raise RuntimeError(f"Unable to find {pyqt_name}.\n" + f"Tried following locations: {pprint.pformat(possible_sip_dirs)}")
+-
+-    def get_pyqt_conda_dirs(self, conda_env_path, pyqt_name):
+-        if sys.platform != 'win32':
+-            self.sip_dir = os.path.join(conda_env_path, "share", "sip", pyqt_name)
+-        else:
+-            self.sip_dir = os.path.join(conda_env_path, 'sip', pyqt_name)
+-
+-
+-def find_conda_env():
+-    if 'CONDA_PREFIX' in os.environ:
+-        return True, os.environ['CONDA_PREFIX']
+-    return False, None
+-
+-
+-def main():
+-    # parse command line
+-    args = get_options()
+-    print(PyQtConfig(major_version=args.version))
+-    return 0
+-
+-
+-def get_options():
+-    parser = argparse.ArgumentParser(description='Extract PyQt config information')
+-    parser.add_argument('version', type=int, help="PyQt major version")
+-    return parser.parse_args()
+-
+-
+-if __name__ == "__main__":
+-    sys.exit(main())
+diff --git a/buildconfig/CMake/FindPyQt5.cmake b/buildconfig/CMake/FindPyQt5.cmake
+index 4beaae51abc2..f966d8979e0c 100644
+--- a/buildconfig/CMake/FindPyQt5.cmake
++++ b/buildconfig/CMake/FindPyQt5.cmake
+@@ -1,6 +1,6 @@
+ # Mantid Repository : https://github.com/mantidproject/mantid
+ #
+-# Copyright &copy; 2008 ISIS Rutherford Appleton Laboratory UKRI, NScD Oak Ridge
++# Copyright &copy; 2021 ISIS Rutherford Appleton Laboratory UKRI, NScD Oak Ridge
+ # National Laboratory, European Spallation Source, Institut Laue - Langevin &
+ # CSNS, Institute of High Energy Physics, CAS SPDX - License - Identifier: GPL -
+ # 3.0 +
+@@ -42,8 +42,136 @@ This module define the following variables:
+   The version of the sip ABI used to build against in the >=v6 build system
+ 
+ #]=======================================================================]
+-# Implementation is defined separately to easily share between multiple PyQt
+-# versions
+-include(PyQtFindImpl)
+ 
+-find_pyqt(5)
++if(NOT PyQt5_FOUND)
++
++set(_command "
++import argparse
++import os
++import pprint
++import re
++import site
++import sys
++
++# Regular expression to extract the Qt version tag
++QT_TAG_RE = re.compile(r'Qt_\\d+_\\d+_\\d+')
++
++pyqt_name = 'PyQt5'
++qtcore = __import__(f'{pyqt_name}.QtCore', globals(), locals(), ['QtCore'], 0)
++version_hex = qtcore.PYQT_VERSION
++version_str = qtcore.PYQT_VERSION_STR
++sip_flags = qtcore.PYQT_CONFIGURATION['sip_flags']
++
++match = QT_TAG_RE.search(sip_flags)
++qt_tag = match.group(0) if match else None
++
++uic = __import__(pyqt_name + '.uic', globals(), locals(), ['uic'], 0)
++pyuic_path = os.path.join(os.path.dirname(uic.__file__), 'pyuic.py')
++
++lines = [
++'pyqt_version:%06.x' % version_hex,
++'pyqt_version_str:%s' % version_str,
++'pyqt_version_tag:%s' % qt_tag,
++'pyqt_sip_flags:%s' % sip_flags,
++'pyqt_pyuic:%s' % pyuic_path,
++ sys.prefix,
++]
++
++sys.stdout.write('\\n'.join(lines))
++"
++)
++
++set(_command_python_paths "
++import site
++import sys
++
++sys.stdout.write(\";\".join((
++  sys.prefix,
++  site.getsitepackages()[0]
++)))
++"
++)
++
++execute_process(COMMAND "${Python_EXECUTABLE}" -c "${_command}"
++                OUTPUT_VARIABLE _pyqt_config
++                RESULT_VARIABLE _result
++                ERROR_VARIABLE _error)
++
++execute_process(COMMAND "${Python_EXECUTABLE}" -c "${_command_python_paths}"
++                OUTPUT_VARIABLE _python_paths
++                RESULT_VARIABLE _result_python_paths
++                ERROR_VARIABLE _error_python_paths)
++
++endif()
++
++if (_pyqt_config)
++string (REGEX MATCH "^pyqt_version:([^\n]+).*$" _dummy ${_pyqt_config})
++set (PYQT5_VERSION "${CMAKE_MATCH_1}" CACHE STRING "PyQt5's version as a 6-digit hexadecimal number" FORCE)
++
++string (REGEX MATCH ".*\npyqt_version_str:([^\n]+).*$" _dummy ${_pyqt_config})
++set (PYQT5_VERSION_STR "${CMAKE_MATCH_1}" CACHE STRING "PyQt5's version as a human-readable string" FORCE)
++
++string (REGEX MATCH ".*\npyqt_version_tag:([^\n]+).*$" _dummy ${_pyqt_config})
++set (PYQT5_VERSION_TAG "${CMAKE_MATCH_1}" CACHE STRING "The Qt version tag used by PyQt5's .sip files" FORCE)
++
++string (REGEX MATCH ".*\npyqt_sip_flags:([^\n]+).*$" _dummy ${_pyqt_config})
++set (PYQT5_SIP_FLAGS "${CMAKE_MATCH_1}" CACHE STRING "The SIP flags used to build PyQt5" FORCE)
++
++string (REGEX MATCH ".*\npyqt_pyuic:([^\n]+).*$" _dummy ${_pyqt_config})
++set (PYQT5_PYUIC "${CMAKE_MATCH_1}" CACHE STRING "Location of the pyuic script" FORCE)
++
++else ()
++message (FATAL_ERROR "Error encountered while determining PyQt confguration:\n${_pyqt_config_err} ${_error}")
++endif()
++
++if (_python_paths)
++list(GET __python_paths 0 _item)
++set(PYTHON_PREFIX "${_item}")
++
++list(GET _python_paths 1 _item)
++set(PYTHON_SITE_PACKAGES "${_item}")
++
++endif()
++
++# If the user has provided ``PyQt_ROOT_DIR``, use it.  Choose items found
++# at this location over system locations.
++if( EXISTS "$ENV{PyQt5_ROOT_DIR}" )
++  file( TO_CMAKE_PATH "$ENV{PyQt5_ROOT_DIR}" PyQt5_ROOT_DIR )
++  set( PyQt5_ROOT_DIR "${PyQt5_ROOT_DIR}" CACHE PATH "Prefix for PyQt5 installation." )
++endif()
++
++#=============================================================================
++# Set SIP_DIR. The find_path calls will prefer custom
++# locations over standard locations (HINTS).
++if(WIN32)
++  list(APPEND _sip_hints ${PYTHON_PREFIX})
++  list(APPEND _sip_suffixes "share/sip/PyQt5" "sip/PyQt5")
++elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
++  list(APPEND _sip_suffixes "share/sip/PyQt5" "share/PyQt5" "PyQt5/bindings" "pyqt/share/sip/Qt5" "mantid-pyqt5/share/sip/Qt5")
++  list(APPEND _sip_hints "/usr/local/opt" ${PYTHON_SITE_PACKAGES})
++else()
++  list(APPEND _sip_hints ${PYTHON_PREFIX}/share)
++  list(APPEND _sip_suffixes "share/sip/PyQt5" "python${Python_MAJOR_VERSION}${Python_MINOR_VERSION}-sip/PyQt5" "python${Python_MAJOR_VERSION}-sip/PyQt5" "sip/PyQt5")
++endif()
++
++find_path(PYQT5_SIP_DIR
++  NAMES QtCore/QtCoremod.sip
++  HINTS ${PyQt_ROOT_DIR} ${_sip_hints}
++  PATH_SUFFIXES ${_sip_suffixes}
++)
++
++message("Found PyQt sip dir ${PYQT5_SIP_DIR}")
++if (NOT EXISTS "${PYQT5_SIP_DIR}/QtCore/QtCoremod.sip")
++  message (FATAL_ERROR "Unable to find QtCore/QtCoremod.sip in ${PYQT5_SIP_DIR}. PyQt sip files are missing.")
++endif()
++
++include ( FindPackageHandleStandardArgs )
++find_package_handle_standard_args(PyQt5 PYQT5_VERSION PYQT5_VERSION_STR PYQT5_VERSION_TAG PYQT5_SIP_DIR PYQT5_SIP_FLAGS PYQT5_PYUIC)
++
++mark_as_advanced ( PYQT5_VERSION
++                   PYQT5_VERSION_STR
++                   PYQT5_VERSION_TAG
++                   PYQT5_SIP_DIR
++                   PYQT5_SIP_FLAGS
++                   PYQT5_PYUIC
++                   )
+\ No newline at end of file
+diff --git a/buildconfig/CMake/QScintillaFindImpl.cmake b/buildconfig/CMake/QScintillaFindImpl.cmake
+index 2bbd05ebf11f..05c18b1f596c 100644
+--- a/buildconfig/CMake/QScintillaFindImpl.cmake
++++ b/buildconfig/CMake/QScintillaFindImpl.cmake
+@@ -53,36 +53,30 @@ function (find_qscintilla qt_version)
+         ${THIRD_PARTY_DIR}/lib/qt5/lib
+       )
+     elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+-      list(APPEND _qsci_include_paths $ENV{CONDA_PREFIX}/include/qt)
+-      list(APPEND _qsci_lib_paths $ENV{CONDA_PREFIX}/lib)
+       list ( APPEND _qsci_include_paths /usr/local/opt/qscintilla2/include )
+       list ( APPEND _qsci_lib_paths /usr/local/opt/qscintilla2/lib )
+     endif ()
+   endif()
+-
+   set ( _include_var QSCINTILLA_QT${qt_version}_INCLUDE_DIR )
+   find_path ( ${_include_var}
+       NAMES Qsci/qsciglobal.h
+-      PATHS ${_qsci_include_paths}
+-      NO_DEFAULT_PATH
++      HINTS ${_qsci_include_paths}
++      PATH_PREFIXES include/qt include
+   )
+ 
+   set ( _library_var QSCINTILLA_QT${qt_version}_LIBRARY )
+-  if ( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+-    set (_opt_outs NO_DEFAULT_PATH )
+-  elseif (${CONDA_BUILD})
++  if (${CONDA_BUILD})
+     set (_opt_outs NO_CMAKE_SYSTEM_PATH)
+   endif()
+-
+   find_library ( ${_library_var}
+     NAMES ${_qsci_lib_names}
+-    PATHS ${_qsci_lib_paths}
++    HINTS ${_qsci_lib_paths}
+     ${_opt_outs}
+   )
+   set ( _library_var_debug QSCINTILLA_QT${qt_version}_LIBRARY_DEBUG )
+   find_library ( ${_library_var_debug}
+     NAMES ${_qsci_lib_names_debug}
+-    PATHS ${_qsci_lib_paths}
++    HINTS ${_qsci_lib_paths}
+     ${_opt_outs}
+   )
+ 
