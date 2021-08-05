@@ -12,6 +12,8 @@ cmake \
   -DENABLE_WORKBENCH=OFF \
   -DENABLE_DOCS=OFF \
   -DUSE_SYSTEM_EIGEN=ON \
+  -DENABLE_MANTIDQT=OFF \
+  -DWORKBENCH_SITE_PACKAGES=$SP_DIR \
   -DENABLE_PRECOMMIT=OFF \
   -DOpenSSL_ROOT=$PREFIX \
   -DHDF5_ROOT=$PREFIX \
@@ -22,4 +24,4 @@ cmake \
 ninja
 ninja install
 
-mv $PREFIX/lib/mantid ${SP_DIR}
+# mv $PREFIX/lib/mantid ${SP_DIR}
