@@ -2,17 +2,16 @@
 {% set git_rev = "27c76b3ebf3ebaa9f001641846e2a3a4daec1dcb" %}
 
 package:
-  name: mantid-framework
+  name: mantid-qt
   version: {{ version }}
 
 source:
   #git_rev: {{ git_rev }}
   git_url: https://github.com/mantidproject/mantid.git
   git_tag: 32079_mantidqt_separate_package
-  # git_tag mantid_framework_conda
   patches:
-    # - finder_patch.patch
-    #- windows_mantid.patch  # [win]
+    - finder_patch.patch
+    - windows_mantid.patch  # [win]
     #- windows_bundle.patch  # [win]
     #- install_patch.patch
 
@@ -42,7 +41,7 @@ requirements:
     - poco
     - tbb-devel=2020.2.*
     - zlib
-    - pip
+    - mantid-framework
   run:
     - {{ pin_compatible("boost", max_pin="x.x") }}
     - {{ pin_compatible("gsl", max_pin="x.x") }}
@@ -59,10 +58,8 @@ requirements:
 
 test:
   imports:
-    - mantid.kernel
-    - mantid.geometry
-    - mantid.api
-    - mantid.simpleapi
+    - mantidqt
+    - mantidqt.icons
 
 about:
   home: https://github.com/mantidproject/mantid

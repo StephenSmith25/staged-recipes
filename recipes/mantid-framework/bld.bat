@@ -6,8 +6,10 @@ cmake ^
     -DCMAKE_PREFIX_PATH=%LIBRARY_PREFIX% ^
     -DCONDA_BUILD=True ^
     -DENABLE_WORKBENCH=OFF ^
+    -DENABLE_MANTIDQT=OFF ^
     -DENABLE_PRECOMMIT=OFF ^
     -DENABLE_DOCS=OFF ^
+    -DWORKBENCH_SITE_PACKAGES=%SP_DIR% ^
     -DUSE_SYSTEM_EIGEN=ON ^
     ..
 
@@ -17,8 +19,8 @@ cmake --build . --config Release --target install
 if errorlevel 1 exit 1
 
 
-set DATA_DIR="%SP_DIR%\mantid"
-if not exist %DATA_DIR% mkdir %DATA_DIR%
-robocopy %LIBRARY_BIN%\mantid %DATA_DIR% * /E
-if %ERRORLEVEL% GTR 3 exit 1
+@REM set DATA_DIR="%SP_DIR%\mantid"
+@REM if not exist %DATA_DIR% mkdir %DATA_DIR%
+@REM robocopy %LIBRARY_BIN%\mantid %DATA_DIR% * /E
+@REM if %ERRORLEVEL% GTR 3 exit 1
 
