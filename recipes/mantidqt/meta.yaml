@@ -1,17 +1,15 @@
-{% set version = "6.1.20210702.1408" %}
-{% set git_rev = "27c76b3ebf3ebaa9f001641846e2a3a4daec1dcb" %}
+{% set version = "6.1.1" %}
 
 package:
   name: mantid-qt
   version: {{ version }}
 
 source:
-  #git_rev: {{ git_rev }}
   git_url: https://github.com/mantidproject/mantid.git
   git_tag: 32079_mantidqt_separate_package
   patches:
-    - finder_patch.patch
-    - windows_mantid.patch  # [win]
+    # - finder_patch.patch
+    # - windows_mantid.patch  # [win]
     #- windows_bundle.patch  # [win]
     #- install_patch.patch
 
@@ -24,37 +22,24 @@ requirements:
     - ninja  # [unix]
     - cmake
   host:
-    - boost<=1.75
-    - eigen
-    - gsl<=2.6
-    - h5py
-    - hdf5=1.10.*
-    - jemalloc  # [unix]
-    - jsoncpp>=1.9.4,<2
-    - librdkafka
-    - lib3mf  # [win]
-    - muparser
-    - nexus
-    - numpy {{ numpy }}
-    - occt
-    - python {{ python }}
-    - poco
     - tbb-devel=2020.2.*
-    - zlib
     - mantid-framework
-  run:
-    - {{ pin_compatible("boost", max_pin="x.x") }}
-    - {{ pin_compatible("gsl", max_pin="x.x") }}
-    - h5py
-    - lib3mf  # [win]
-    - matplotlib-base
-    - nexus
-    - {{ pin_compatible("numpy", max_pin="x.x") }}
-    - occt
+    - eigen
+    - qscintilla2
+    - psutil
+    - qt==5.12.9
+    - qtpy >=1.5.0
+    - setuptools=48.0.0
+    - tbb-devel=2020.2.*
+    - python.app
     - python
-    - python-dateutil
-    - pyyaml
-    - scipy
+
+  run:
+    - pyqt>=5.12.3,<6
+    - qtconsole >=5.0.3,<6
+    - matplotlib
+    - python
+    - python.app
 
 test:
   imports:

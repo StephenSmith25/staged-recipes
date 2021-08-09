@@ -1,12 +1,10 @@
-{% set version = "6.1.20210702.1408" %}
-{% set git_rev = "27c76b3ebf3ebaa9f001641846e2a3a4daec1dcb" %}
+{% set version = "6.1.1" %}
 
 package:
   name: mantid-framework
   version: {{ version }}
 
 source:
-  #git_rev: {{ git_rev }}
   git_url: https://github.com/mantidproject/mantid.git
   git_tag: 32079_mantidqt_separate_package
   # git_tag mantid_framework_conda
@@ -15,6 +13,11 @@ source:
     #- windows_mantid.patch  # [win]
     #- windows_bundle.patch  # [win]
     #- install_patch.patch
+
+build:
+  number: 0
+  run_exports:
+    - {{ pin_subpackage('mantid-framework', max_pin='x.x.x') }}
 
 requirements:
   build:
@@ -31,7 +34,7 @@ requirements:
     - h5py
     - hdf5=1.10.*
     - jemalloc  # [unix]
-    - jsoncpp>=1.9.4,<2
+    - jsoncpp
     - librdkafka
     - lib3mf  # [win]
     - muparser
@@ -47,6 +50,7 @@ requirements:
     - {{ pin_compatible("boost", max_pin="x.x") }}
     - {{ pin_compatible("gsl", max_pin="x.x") }}
     - h5py
+    - {{ pin_compatible("jsoncpp", max_pin="x.x.x") }}
     - lib3mf  # [win]
     - matplotlib-base
     - nexus
