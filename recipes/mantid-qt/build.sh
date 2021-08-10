@@ -4,6 +4,7 @@ set -ex
 mkdir build
 cd build
 
+
 cmake \
   ${CMAKE_ARGS} \
   -DCMAKE_BUILD_TYPE=Release \
@@ -24,5 +25,3 @@ cmake \
 
 ninja
 ninja install
-
-# mv $PREFIX/lib/mantid ${SP_DIR}

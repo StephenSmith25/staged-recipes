@@ -1,0 +1,93 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 149a7894b58..f52e732dc86 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -186,7 +186,6 @@ endif()
+ 
+ if(ENABLE_WORKBENCH OR MANTID_QT_LIB STREQUAL "BUILD")
+   add_custom_target(GUITests)
+-  add_dependencies(check GUITests)
+   # Collect all tests together
+   add_dependencies(AllTests GUITests)
+   add_subdirectory(qt)
+diff --git a/Framework/CMakeLists.txt b/Framework/CMakeLists.txt
+index c4433e2d5b0..fa84d0e9973 100644
+--- a/Framework/CMakeLists.txt
++++ b/Framework/CMakeLists.txt
+@@ -22,7 +22,6 @@ endif()
+ 
+ 
+ add_custom_target(FrameworkTests) # target for all framework tests
+-add_dependencies(check FrameworkTests)
+ add_dependencies(FrameworkTests Framework)
+ 
+ 
+diff --git a/Framework/CurveFitting/inc/MantidCurveFitting/ExcludeRangeFinder.h b/Framework/CurveFitting/inc/MantidCurveFitting/ExcludeRangeFinder.h
+index 2f75e86b2ee..11080f042fb 100644
+--- a/Framework/CurveFitting/inc/MantidCurveFitting/ExcludeRangeFinder.h
++++ b/Framework/CurveFitting/inc/MantidCurveFitting/ExcludeRangeFinder.h
+@@ -8,6 +8,7 @@
+ 
+ #include "MantidCurveFitting/DllConfig.h"
+ 
++#include <cstddef>
+ #include <vector>
+ 
+ namespace Mantid {
+@@ -31,7 +32,7 @@ private:
+   /// Find the range from m_exclude that may contain points x >= p
+   void findNextExcludedRange(double p);
+   /// Index of current excluded range
+-  size_t m_exclIndex;
++  std::size_t m_exclIndex;
+   /// Start of current excluded range
+   double m_startExcludedRange;
+   /// End of current excluded range
+@@ -39,7 +40,7 @@ private:
+   /// Reference to a list of exclusion ranges.
+   const std::vector<double> m_exclude;
+   /// Size of m_exclude.
+-  const size_t m_size;
++  const std::size_t m_size;
+ };
+ 
+ } // namespace CurveFitting
+diff --git a/Framework/CurveFitting/src/ExcludeRangeFinder.cpp b/Framework/CurveFitting/src/ExcludeRangeFinder.cpp
+index f1f5df021dd..a70a379474a 100644
+--- a/Framework/CurveFitting/src/ExcludeRangeFinder.cpp
++++ b/Framework/CurveFitting/src/ExcludeRangeFinder.cpp
+@@ -69,7 +69,7 @@ void ExcludeRangeFinder::findNextExcludedRange(double p) {
+   // the previous point. Keep index m_exclIndex pointing to the start.
+   for (auto it = m_exclude.begin() + m_exclIndex; it != m_exclude.end(); ++it) {
+     if (*it >= p) {
+-      m_exclIndex = static_cast<size_t>(std::distance(m_exclude.begin(), it));
++      m_exclIndex = static_cast<std::size_t>(std::distance(m_exclude.begin(), it));
+       if (m_exclIndex % 2 == 0) {
+         // A number at an even position in m_exclude starts an exclude
+         // range
+diff --git a/buildconfig/CMake/FindCxxTest.cmake b/buildconfig/CMake/FindCxxTest.cmake
+index 0e012f12fb6..d896dc798e1 100644
+--- a/buildconfig/CMake/FindCxxTest.cmake
++++ b/buildconfig/CMake/FindCxxTest.cmake
+@@ -185,7 +185,7 @@ QT_QPA_PLATFORM_PLUGIN_PATH=${_qt_qpa_platform_plugin}\n\
+ PYTHONHOME=${_python_home}")
+ 
+     # only the package wide test is added to check
+-    add_dependencies(check ${_cxxtest_testname})
++    #add_dependencies(check ${_cxxtest_testname})
+ 
+     # add each separate test to ctest
+     foreach ( part ${ARGN} )
+diff --git a/buildconfig/CMake/LinuxPackageScripts.cmake b/buildconfig/CMake/LinuxPackageScripts.cmake
+index 0bc44f6347e..206ac9177c3 100644
+--- a/buildconfig/CMake/LinuxPackageScripts.cmake
++++ b/buildconfig/CMake/LinuxPackageScripts.cmake
+@@ -20,7 +20,7 @@ set ( PLUGINS_DIR plugins )
+ 
+ set ( WORKBENCH_BIN_DIR ${BIN_DIR} )
+ set ( WORKBENCH_LIB_DIR ${LIB_DIR} )
+-set ( WORKBENCH_SITE_PACKAGES ${LIB_DIR} )
++set ( WORKBENCH_SITE_PACKAGES ${LIB_DIR} CACHE PATH "Path to workbench site packages install location")
+ set ( WORKBENCH_PLUGINS_DIR ${PLUGINS_DIR} )
+ 
+ if ( CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )

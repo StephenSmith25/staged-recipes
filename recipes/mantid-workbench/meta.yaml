@@ -10,6 +10,7 @@ source:
   patches:
     - bundle.patch  # [osx]
     - install_patch.patch
+    - linux_patch.patch  # [linux]
 
 build:
   number: 0

@@ -7,6 +7,8 @@ package:
 source:
   git_url: https://github.com/mantidproject/mantid.git
   git_tag: 32079_mantidqt_separate_package
+  patches:
+    - linux_patch.patch  # [linux]
 
 build:
   number: 0
@@ -21,6 +23,12 @@ requirements:
     - libgomp  # [linux]
     - ninja  # [unix]
     - cmake
+    - {{ cdt('mesa-libgl-devel') }}  # [linux]
+    - {{ cdt('mesa-dri-drivers') }}  # [linux]
+    - {{ cdt('libxxf86vm') }}  # [linux]
+    - {{ cdt('libx11-devel') }}  # [linux]
+    - {{ cdt('xorg-x11-proto-devel') }}  # [linux]
+
   host:
     - eigen
     - jemalloc  # [unix]
