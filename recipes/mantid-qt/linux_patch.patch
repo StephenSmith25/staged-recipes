@@ -65,6 +65,19 @@ index f1f5df021dd..a70a379474a 100644
        if (m_exclIndex % 2 == 0) {
          // A number at an even position in m_exclude starts an exclude
          // range
+diff --git a/buildconfig/CMake/DarwinSetup.cmake b/buildconfig/CMake/DarwinSetup.cmake
+index 6f15d3cf49f..b8952fbfef7 100644
+--- a/buildconfig/CMake/DarwinSetup.cmake
++++ b/buildconfig/CMake/DarwinSetup.cmake
+@@ -7,7 +7,7 @@ set ( LIB_DIR lib )
+ set ( SITE_PACKAGES ${LIB_DIR} )
+ set ( PLUGINS_DIR plugins )
+ 
+-set ( WORKBENCH_BIN_DIR ${BIN_DIR} )
++set ( WORKBENCH_BIN_DIR ${BIN_DIR} CACHE PATH "Location of workbench binary")
+ set ( WORKBENCH_LIB_DIR ${LIB_DIR} )
+ set ( WORKBENCH_SITE_PACKAGES ${LIB_DIR} CACHE PATH "Location of site packages")
+ set ( WORKBENCH_PLUGINS_DIR ${PLUGINS_DIR} )
 diff --git a/buildconfig/CMake/FindCxxTest.cmake b/buildconfig/CMake/FindCxxTest.cmake
 index 0e012f12fb6..8b8b485b361 100644
 --- a/buildconfig/CMake/FindCxxTest.cmake
@@ -85,3 +98,49 @@ index 0e012f12fb6..8b8b485b361 100644
  
  file(GLOB_RECURSE CXXTEST_PYTHON_FILES
       ${PROJECT_SOURCE_DIR}/Testing/Tools/cxxtest/python/*.py)
+diff --git a/buildconfig/CMake/LinuxPackageScripts.cmake b/buildconfig/CMake/LinuxPackageScripts.cmake
+index 0bc44f6347e..50ac9ccd847 100644
+--- a/buildconfig/CMake/LinuxPackageScripts.cmake
++++ b/buildconfig/CMake/LinuxPackageScripts.cmake
+@@ -18,9 +18,9 @@ set ( LIB_DIR lib )
+ set ( SITE_PACKAGES ${LIB_DIR} )
+ set ( PLUGINS_DIR plugins )
+ 
+-set ( WORKBENCH_BIN_DIR ${BIN_DIR} )
++set (WORKBENCH_BIN_DIR ${BIN_DIR} CACHE PATH "Location of workbench binary")
+ set ( WORKBENCH_LIB_DIR ${LIB_DIR} )
+-set ( WORKBENCH_SITE_PACKAGES ${LIB_DIR} )
++set ( WORKBENCH_SITE_PACKAGES ${LIB_DIR} CACHE PATH "Location of site packages")
+ set ( WORKBENCH_PLUGINS_DIR ${PLUGINS_DIR} )
+ 
+ if ( CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
+diff --git a/buildconfig/CMake/MSVCSetup.cmake b/buildconfig/CMake/MSVCSetup.cmake
+index a24a14ef989..c6f426ee4d8 100644
+--- a/buildconfig/CMake/MSVCSetup.cmake
++++ b/buildconfig/CMake/MSVCSetup.cmake
+@@ -219,7 +219,7 @@ set(SITE_PACKAGES ${LIB_DIR})
+ # This is the root of the plugins directory
+ set(PLUGINS_DIR plugins)
+ 
+-set(WORKBENCH_BIN_DIR ${BIN_DIR})
++set(WORKBENCH_BIN_DIR ${BIN_DIR} CACHE PATH "Location of workbench binary")
+ set(WORKBENCH_LIB_DIR ${LIB_DIR})
+ set(WORKBENCH_SITE_PACKAGES ${LIB_DIR} CACHE PATH "Path to workbench site packages install location")
+ set(WORKBENCH_PLUGINS_DIR ${PLUGINS_DIR})
+diff --git a/buildconfig/CMake/PythonPackageTargetFunctions.cmake b/buildconfig/CMake/PythonPackageTargetFunctions.cmake
+index 9f7aa4e27e7..f104410c3c6 100644
+--- a/buildconfig/CMake/PythonPackageTargetFunctions.cmake
++++ b/buildconfig/CMake/PythonPackageTargetFunctions.cmake
+@@ -123,11 +123,11 @@ function(add_python_package pkg_name)
+       )
+     endforeach()
+   endif()
+-  endif()
+   # install the generated executable
+   if(_parsed_arg_EXECUTABLE AND _parsed_arg_INSTALL_BIN_DIR)
+     install(PROGRAMS ${_setup_py_build_root}/install/bin/${pkg_name}
+             DESTINATION ${_parsed_arg_INSTALL_BIN_DIR}
+     )
+   endif()
++  endif()
+ endfunction()
