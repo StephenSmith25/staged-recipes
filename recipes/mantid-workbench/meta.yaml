@@ -13,11 +13,9 @@ source:
 
 build:
   number: 0
-  skip: true  # [py36 and aarch64]
   entry_points:
     - workbench = workbench.app.main:main
   osx_is_app: true
-
 
 requirements:
   build:
@@ -25,13 +23,15 @@ requirements:
     - ninja  # [unix]
     - cmake
   host:
-    - boost 1.75.*
+    - boost {{ boost }}
     - mantid-qt
-    - python.app  # [osx]
     - setuptools 48.0.*
   run:    
+    - ipykernel <6
     - psutil
+    - python
     - python.app  # [osx]
+    - qtconsole
 
 test:
   imports:

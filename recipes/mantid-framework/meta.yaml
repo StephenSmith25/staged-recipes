@@ -22,7 +22,7 @@ requirements:
     - ninja  # [unix]
     - cmake
   host:
-    - boost<=1.75
+    - boost {{ boost }}
     - eigen
     - gsl<=2.6
     - h5py

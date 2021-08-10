@@ -25,23 +25,19 @@ requirements:
     - eigen
     - jemalloc  # [unix]
     - mantid-framework
-    - poco
     - python
-    - qscintilla2
     - pyqt
     - qt 5.12.*
+    - qscintilla2
     - setuptools 48.0.*
     - tbb-devel 2020.2.*
 
   run:
-    - pyqt
+    - matplotlib-base
     - {{ pin_compatible("qscintilla2", max_pin="x.x") }}
     - qtpy
-    - qtconsole
-    - matplotlib
-    - psutil
     - python
-
+    
 test:
   imports:
     - mantidqt
