@@ -7,12 +7,6 @@ package:
 source:
   git_url: https://github.com/mantidproject/mantid.git
   git_tag: 32079_mantidqt_separate_package
-  # git_tag mantid_framework_conda
-  patches:
-    # - finder_patch.patch
-    #- windows_mantid.patch  # [win]
-    #- windows_bundle.patch  # [win]
-    #- install_patch.patch
 
 build:
   number: 0
@@ -50,7 +44,6 @@ requirements:
     - {{ pin_compatible("boost", max_pin="x.x") }}
     - {{ pin_compatible("gsl", max_pin="x.x") }}
     - h5py
-    - {{ pin_compatible("jsoncpp", max_pin="x.x.x") }}
     - lib3mf  # [win]
     - matplotlib-base
     - nexus

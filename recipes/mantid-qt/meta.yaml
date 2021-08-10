@@ -7,11 +7,11 @@ package:
 source:
   git_url: https://github.com/mantidproject/mantid.git
   git_tag: 32079_mantidqt_separate_package
-  patches:
-    # - finder_patch.patch
-    # - windows_mantid.patch  # [win]
-    #- windows_bundle.patch  # [win]
-    #- install_patch.patch
+
+build:
+  number: 0
+  run_exports:
+    - {{ pin_subpackage('mantid-qt', max_pin='x.x.x') }}
 
 requirements:
   build:
@@ -22,14 +22,11 @@ requirements:
     - ninja  # [unix]
     - cmake
   host:
-    - mantid-framework
     - eigen
     - jemalloc  # [unix]
-    - gsl 2.6.*
+    - mantid-framework
     - poco
-    - psutil
     - python
-    - python.app  # [osx]
     - qscintilla2
     - pyqt
     - qt 5.12.*
@@ -38,11 +35,12 @@ requirements:
 
   run:
     - pyqt
+    - {{ pin_compatible("qscintilla2", max_pin="x.x") }}
     - qtpy
     - qtconsole
     - matplotlib
+    - psutil
     - python
-    - python.app  # [osx]
 
 test:
   imports:

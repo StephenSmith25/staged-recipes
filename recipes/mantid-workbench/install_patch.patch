@@ -1,0 +1,26 @@
+diff --git a/buildconfig/CMake/PythonPackageTargetFunctions.cmake b/buildconfig/CMake/PythonPackageTargetFunctions.cmake
+index 9f7aa4e27e7b0..56adba41e71a1 100644
+--- a/buildconfig/CMake/PythonPackageTargetFunctions.cmake
++++ b/buildconfig/CMake/PythonPackageTargetFunctions.cmake
+@@ -35,21 +35,6 @@ function(add_python_package pkg_name)
+     set(_egg_link ${_egg_link_dir}/${pkg_name}.egg-link)
+   endif()
+ 
+-  if(_parsed_arg_EXECUTABLE)
+-    if(WIN32)
+-      # add .exe in the executable name for Windows, otherwise it can't find it
+-      # during the install step
+-      set(_executable_name ${pkg_name}.exe)
+-      set(_startup_script_full_name ${pkg_name}-script.pyw)
+-      set(_startup_script ${_egg_link_dir}/${_startup_script_full_name})
+-    else()
+-      set(_startup_script_full_name)
+-      set(_startup_script)
+-      set(_executable_name ${pkg_name})
+-    endif()
+-    set(_startup_exe ${_egg_link_dir}/${_executable_name})
+-  endif()
+-
+   # create the developer setup which just creates a pth file rather than copying
+   # things over
+   set(_outputs ${_egg_link} ${_startup_script} ${_startup_exe})

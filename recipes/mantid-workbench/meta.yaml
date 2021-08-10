@@ -1,86 +1,41 @@
-{% set version = "6.1.20210702.1408" %}
-{% set git_rev = "27c76b3ebf3ebaa9f001641846e2a3a4daec1dcb" %}
+{% set version = "6.1.1" %}
 
 package:
   name: mantid-workbench
   version: {{ version }}
 
 source:
-  git_rev: {{ git_rev }}
   git_url: https://github.com/mantidproject/mantid.git
+  git_tag: 32079_mantidqt_separate_package
   patches:
-    - bundle.patch
-    - finder.patch
-    - windows_bundle.patch  # [win]
-    - windows_mantid.patch  # [win]
-    - framework_patch.patch
+    - bundle.patch  # [osx]
+    - install_patch.patch
+
+build:
+  number: 0
+  skip: true  # [py36 and aarch64]
+  entry_points:
+    - workbench = workbench.app.main:main
+  osx_is_app: true
 
 
 requirements:
   build:
-    - {{ compiler("c") }}
     - {{ compiler("cxx") }}
-    - llvm-openmp  # [osx]
-    - libgomp  # [linux]
     - ninja  # [unix]
     - cmake
   host:
-    - boost {{ boost }}
-    - doxygen>=1.9.*
-    - graphviz>=2.47.0
-    - gsl <=2.6
-    - h5py
-    - hdf5=1.10.*
-    - jemalloc  # [unix]
-    - jsoncpp>=1.9.4,<2
-    - librdkafka
-    - lib3mf   # [win]
-    - muparser
-    - nexus
-    - numpy {{ numpy }}
-    - occt
-    - python {{ python }}
+    - boost 1.75.*
+    - mantid-qt
     - python.app  # [osx]
-    - poco
-    - pyqt>=5.12.3,<6
-    - qscintilla2
+    - setuptools 48.0.*
+  run:    
     - psutil
-    - qt==5.12.9
-    - qtpy >=1.5.0
-    - setuptools=48.0.0 
-    - sphinx
-    - sphinx_bootstrap_theme   
-    - texlive-core  # [osx]
-    - tbb-devel=2020.2.*
-    - texlive-core  # [osx]
-    - qtconsole >=5.0.3,<6
-    - zlib
-  run:
-    - boost
-    - h5py
-    - nexus
-    - lib3mf  # [win]
-    - {{ pin_compatible("numpy", max_pin="x.x") }}
-    - occt
-    - pip
-    - psutil
-    - python
     - python.app  # [osx]
-    - python-dateutil>=2.8.1
-    - pyyaml
-    - {{ pin_compatible("qscintilla2", max_pin="x.x") }}
-    - qtconsole
-    - scipy
-    - ipykernel<6
-    - matplotlib
-    - toml
 
 test:
   imports:
-    - mantid.kernel
-    - mantid.geometry
-    - mantid.api
-    - mantid.simpleapi
+    - workbench
 
 about:
   home: https://github.com/mantidproject/mantid

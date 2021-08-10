@@ -25,5 +25,3 @@ cmake \
 
 ninja
 ninja install
-
-# mv $PREFIX/lib/mantid ${SP_DIR}

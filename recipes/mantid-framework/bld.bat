@@ -17,10 +17,3 @@ if errorlevel 1 exit 1
 cmake --build . --config Release
 cmake --build . --config Release --target install
 if errorlevel 1 exit 1
-
-
-@REM set DATA_DIR="%SP_DIR%\mantid"
-@REM if not exist %DATA_DIR% mkdir %DATA_DIR%
-@REM robocopy %LIBRARY_BIN%\mantid %DATA_DIR% * /E
-@REM if %ERRORLEVEL% GTR 3 exit 1
-
