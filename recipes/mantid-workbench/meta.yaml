@@ -9,7 +9,6 @@ source:
   git_tag: 32079_mantidqt_separate_package
   patches:
     - bundle.patch  # [osx]
-    - install_patch.patch 
     - linux_patch.patch  # [linux]
 
 build:
@@ -27,7 +26,7 @@ requirements:
     - {{ cdt('mesa-dri-drivers') }}  # [linux]
     - {{ cdt('libxxf86vm') }}  # [linux]
     - {{ cdt('libx11-devel') }}  # [linux]
-    - {{ cdt('xorg-x11-proto-devel') }}  # [linux
+    - {{ cdt('xorg-x11-proto-devel') }}  # [linux]
   host:
     - boost {{ boost }}
     - mantid-qt
