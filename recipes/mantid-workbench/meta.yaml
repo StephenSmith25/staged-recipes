@@ -8,7 +8,6 @@ source:
   git_url: https://github.com/mantidproject/mantid.git
   git_tag: 32079_mantidqt_separate_package
   patches:
-    - bundle.patch  # [osx]
     - linux_patch.patch  # [linux]
 
 build:

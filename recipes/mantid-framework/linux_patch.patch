@@ -1,29 +1,5 @@
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 149a7894b58..f52e732dc86 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -186,7 +186,6 @@ endif()
- 
- if(ENABLE_WORKBENCH OR MANTID_QT_LIB STREQUAL "BUILD")
-   add_custom_target(GUITests)
--  add_dependencies(check GUITests)
-   # Collect all tests together
-   add_dependencies(AllTests GUITests)
-   add_subdirectory(qt)
-diff --git a/Framework/CMakeLists.txt b/Framework/CMakeLists.txt
-index c4433e2d5b0..fa84d0e9973 100644
---- a/Framework/CMakeLists.txt
-+++ b/Framework/CMakeLists.txt
-@@ -22,7 +22,6 @@ endif()
- 
- 
- add_custom_target(FrameworkTests) # target for all framework tests
--add_dependencies(check FrameworkTests)
- add_dependencies(FrameworkTests Framework)
- 
- 
 diff --git a/Framework/CurveFitting/inc/MantidCurveFitting/ExcludeRangeFinder.h b/Framework/CurveFitting/inc/MantidCurveFitting/ExcludeRangeFinder.h
-index 2f75e86b2ee..11080f042fb 100644
+index 2f75e86b2ee..1e30aa08721 100644
 --- a/Framework/CurveFitting/inc/MantidCurveFitting/ExcludeRangeFinder.h
 +++ b/Framework/CurveFitting/inc/MantidCurveFitting/ExcludeRangeFinder.h
 @@ -8,6 +8,7 @@
@@ -43,7 +19,7 @@ index 2f75e86b2ee..11080f042fb 100644
    /// Start of current excluded range
    double m_startExcludedRange;
    /// End of current excluded range
-@@ -39,7 +40,7 @@ private:
+@@ -39,8 +40,8 @@ private:
    /// Reference to a list of exclusion ranges.
    const std::vector<double> m_exclude;
    /// Size of m_exclude.
@@ -52,6 +28,9 @@ index 2f75e86b2ee..11080f042fb 100644
  };
  
  } // namespace CurveFitting
+-} // namespace Mantid
++} // namespace Mantid
+\ No newline at end of file
 diff --git a/Framework/CurveFitting/src/ExcludeRangeFinder.cpp b/Framework/CurveFitting/src/ExcludeRangeFinder.cpp
 index f1f5df021dd..a70a379474a 100644
 --- a/Framework/CurveFitting/src/ExcludeRangeFinder.cpp
@@ -65,82 +44,16 @@ index f1f5df021dd..a70a379474a 100644
        if (m_exclIndex % 2 == 0) {
          // A number at an even position in m_exclude starts an exclude
          // range
-diff --git a/buildconfig/CMake/DarwinSetup.cmake b/buildconfig/CMake/DarwinSetup.cmake
-index 6f15d3cf49f..b8952fbfef7 100644
---- a/buildconfig/CMake/DarwinSetup.cmake
-+++ b/buildconfig/CMake/DarwinSetup.cmake
-@@ -7,7 +7,7 @@ set ( LIB_DIR lib )
- set ( SITE_PACKAGES ${LIB_DIR} )
- set ( PLUGINS_DIR plugins )
- 
--set ( WORKBENCH_BIN_DIR ${BIN_DIR} )
-+set ( WORKBENCH_BIN_DIR ${BIN_DIR} CACHE PATH "Location of workbench binary")
- set ( WORKBENCH_LIB_DIR ${LIB_DIR} )
- set ( WORKBENCH_SITE_PACKAGES ${LIB_DIR} CACHE PATH "Location of site packages")
- set ( WORKBENCH_PLUGINS_DIR ${PLUGINS_DIR} )
-diff --git a/buildconfig/CMake/FindCxxTest.cmake b/buildconfig/CMake/FindCxxTest.cmake
-index 0e012f12fb6..8b8b485b361 100644
---- a/buildconfig/CMake/FindCxxTest.cmake
-+++ b/buildconfig/CMake/FindCxxTest.cmake
-@@ -249,13 +249,8 @@ endmacro(CXXTEST_ADD_TEST)
- # main()
- #=============================================================
- 
--find_path(CXXTEST_INCLUDE_DIR cxxtest/TestSuite.h
--          PATHS ${PROJECT_SOURCE_DIR}/Testing/Tools/cxxtest
--	        ${PROJECT_SOURCE_DIR}/../Testing/Tools/cxxtest
--                NO_DEFAULT_PATH )
--
--find_program(CXXTEST_TESTGEN_EXECUTABLE python/scripts/cxxtestgen
--             PATHS ${CXXTEST_INCLUDE_DIR})
-+set(CXXTEST_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/Testing/Tools/cxxtest)
-+set(CXXTEST_TESTGEN_EXECUTABLE ${CXXTEST_INCLUDE_DIR}/python/scripts/cxxtestgen)
- 
- file(GLOB_RECURSE CXXTEST_PYTHON_FILES
-      ${PROJECT_SOURCE_DIR}/Testing/Tools/cxxtest/python/*.py)
 diff --git a/buildconfig/CMake/LinuxPackageScripts.cmake b/buildconfig/CMake/LinuxPackageScripts.cmake
-index 0bc44f6347e..50ac9ccd847 100644
+index 0bc44f6347e..a8d8d403deb 100644
 --- a/buildconfig/CMake/LinuxPackageScripts.cmake
 +++ b/buildconfig/CMake/LinuxPackageScripts.cmake
-@@ -18,9 +18,9 @@ set ( LIB_DIR lib )
- set ( SITE_PACKAGES ${LIB_DIR} )
- set ( PLUGINS_DIR plugins )
+@@ -20,7 +20,7 @@ set ( PLUGINS_DIR plugins )
  
--set ( WORKBENCH_BIN_DIR ${BIN_DIR} )
-+set (WORKBENCH_BIN_DIR ${BIN_DIR} CACHE PATH "Location of workbench binary")
+ set ( WORKBENCH_BIN_DIR ${BIN_DIR} )
  set ( WORKBENCH_LIB_DIR ${LIB_DIR} )
 -set ( WORKBENCH_SITE_PACKAGES ${LIB_DIR} )
-+set ( WORKBENCH_SITE_PACKAGES ${LIB_DIR} CACHE PATH "Location of site packages")
++set (WORKBENCH_SITE_PACKAGES ${LIB_DIR} CACHE PATH "Path to workbench site packages install location")
  set ( WORKBENCH_PLUGINS_DIR ${PLUGINS_DIR} )
  
  if ( CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
-diff --git a/buildconfig/CMake/MSVCSetup.cmake b/buildconfig/CMake/MSVCSetup.cmake
-index a24a14ef989..c6f426ee4d8 100644
---- a/buildconfig/CMake/MSVCSetup.cmake
-+++ b/buildconfig/CMake/MSVCSetup.cmake
-@@ -219,7 +219,7 @@ set(SITE_PACKAGES ${LIB_DIR})
- # This is the root of the plugins directory
- set(PLUGINS_DIR plugins)
- 
--set(WORKBENCH_BIN_DIR ${BIN_DIR})
-+set(WORKBENCH_BIN_DIR ${BIN_DIR} CACHE PATH "Location of workbench binary")
- set(WORKBENCH_LIB_DIR ${LIB_DIR})
- set(WORKBENCH_SITE_PACKAGES ${LIB_DIR} CACHE PATH "Path to workbench site packages install location")
- set(WORKBENCH_PLUGINS_DIR ${PLUGINS_DIR})
-diff --git a/buildconfig/CMake/PythonPackageTargetFunctions.cmake b/buildconfig/CMake/PythonPackageTargetFunctions.cmake
-index 9f7aa4e27e7..f104410c3c6 100644
---- a/buildconfig/CMake/PythonPackageTargetFunctions.cmake
-+++ b/buildconfig/CMake/PythonPackageTargetFunctions.cmake
-@@ -123,11 +123,11 @@ function(add_python_package pkg_name)
-       )
-     endforeach()
-   endif()
--  endif()
-   # install the generated executable
-   if(_parsed_arg_EXECUTABLE AND _parsed_arg_INSTALL_BIN_DIR)
-     install(PROGRAMS ${_setup_py_build_root}/install/bin/${pkg_name}
-             DESTINATION ${_parsed_arg_INSTALL_BIN_DIR}
-     )
-   endif()
-+  endif()
- endfunction()
