@@ -7,8 +7,6 @@ package:
 source:
   git_url: https://github.com/mantidproject/mantid.git
   git_tag: 32079_mantidqt_separate_package
-  patches:
-    - linux_patch.patch  # [linux]
 
 build:
   number: 0
