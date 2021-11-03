@@ -1,4 +1,4 @@
-{% set version = "6.1.1" %}
+{% set version = "6.2.1" %}
 
 package:
   name: mantid-qt
@@ -6,7 +6,7 @@ package:
 
 source:
   git_url: https://github.com/mantidproject/mantid.git
-  git_tag: 32079_mantidqt_separate_package
+  git_tag: main
 
 build:
   number: 0
@@ -30,7 +30,7 @@ requirements:
   host:
     - eigen
     - jemalloc  # [unix]
-    - mantid-framework
+    - mantid-framework {{ version }}
     - python
     - pyqt
     - qt 5.12.*
